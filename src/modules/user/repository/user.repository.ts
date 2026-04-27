@@ -1,8 +1,8 @@
 import { prisma } from '../../../lib/prisma.js';
-import type { createUserDTO } from '../dto/user.dto.js';
+import type { createUserData } from '../types/create-user-data.js';
 
 export class UserRepository {
-  async create(data: createUserDTO) {
+  async create(data: createUserData) {
     return prisma.user.create({
       data,
       select: { id: true, fullName: true, email: true },
