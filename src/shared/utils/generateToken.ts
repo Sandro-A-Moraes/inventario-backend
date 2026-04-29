@@ -9,7 +9,7 @@ export function generateAccessToken(payload: AccessTokenPayload): string {
 }
 
 export function generateRefreshToken(payload: RefreshTokenPayload): string {
-  return jwt.sign(payload, process.env.JWT_SECRET_KEY as string, {
+  return jwt.sign(payload, process.env.JWT_REFRESH_SECRET_KEY as string, {
     expiresIn: '7d',
   });
 }
