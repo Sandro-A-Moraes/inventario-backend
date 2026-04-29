@@ -3,9 +3,12 @@ import { refreshTokenRepository } from "../repository/refreshToken.repository.js
 import type { RegisterData } from "../types/register-data.js";
 import { validateEmail } from "../../../shared/utils/validateEmail.js";
 import bcrypt from 'bcrypt';
-// import type { LoginData } from "../types/login-data.js";
+import type { LoginData } from "../types/login-data.js";
 import type { User } from "../../user/types/user.js";
-// import type { AuthResponse } from "../types/auth-response.js";
+import type { AuthResponse } from "../types/auth-response.js";
+import { generateAccessToken, generateRefreshToken } from "../../../shared/utils/generateToken.js";
+import { generateRandomJTI, hashToken } from "../../../shared/utils/hashToken.js";
+
 
 export class AuthService {
     private refreshTokenRepository: refreshTokenRepository;
@@ -34,17 +37,40 @@ export class AuthService {
         });
     }
 
-    // public async login (data: LoginData): Promise<AuthResponse> {
-    //     const existingUser = await this.userRepository.findByEmail(data.email)
+    public async login (data: LoginData): Promise<AuthResponse> {
+        const existingUser = await this.userRepository.findByEmail(data.email)
 
-    //     if(!existingUser){
-    //         throw new Error('Email not registered')
-    //     }
+        if(!existingUser){
+            throw new Error('Email not registered')
+        }
         
-    //     const isPasswordValid = await bcrypt.compare(data.password, existingUser.hashedPassword)
+        const isPasswordValid = await bcrypt.compare(data.password, existingUser.hashedPassword)
 
-    //     if(!isPasswordValid){
-    //         throw new Error('Incorrect Password')
-    //     }
-    // }
+        if(!isPasswordValid){
+            throw new Error('Incorrect Password')
+        }
+
+        const jti = generateRandomJTI()
+
+        const refreshToken = generateRefreshToken({sub: existingUser.id, jti})
+
+        const tokenHash = hashToken(refreshToken)
+
+        const accessToken = generateAccessToken({sub: existingUser.id, email: existingUser.email})
+        
+        const timeToExpire = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+
+        await this.refreshTokenRepository.create({
+            userId: existingUser.id,
+            tokenHash,
+            jti,
+            expiresAt: new Date(Date.now() + timeToExpire)
+        })
+
+        return {
+            user: existingUser,
+            accessToken,
+            refreshToken
+        }
+    }
 }
