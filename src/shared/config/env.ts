@@ -1,5 +1,5 @@
 function getEnv(name: string): string {
-  const value = process.env.JWT_SECRET_KEY;
+  const value = process.env[name];
 
   if (!value) {
     throw new Error(`Missing environment variable: ${name}`);
