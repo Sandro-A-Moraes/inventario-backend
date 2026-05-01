@@ -1,9 +1,8 @@
-import dotenv from 'dotenv'
-import express from 'express'
-import cors from 'cors'
+import 'dotenv/config';
+import express from 'express';
+import cors from 'cors';
 import v1Router from './routes/v1/routes.js';
-
-dotenv.config();
+import '../../shared/config/env'
 
 const app = express();
 app.use(cors());
