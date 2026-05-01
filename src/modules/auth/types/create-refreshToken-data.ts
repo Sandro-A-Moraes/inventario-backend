@@ -1,4 +1,4 @@
-export type refreshTokenData = {
+export type RefreshTokenData = {
     userId: string;
     jti: string;
     tokenHash: string;

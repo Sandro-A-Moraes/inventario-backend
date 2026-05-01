@@ -1,5 +1,5 @@
 import type { UserRepository } from "../../user/repository/user.repository.js";
-import { refreshTokenRepository } from "../repository/refreshToken.repository.js";
+import { RefreshTokenRepository } from "../repository/refreshToken.repository.js";
 import type { RegisterData } from "../types/register-data.js";
 import { validateEmail } from "../../../shared/utils/validateEmail.js";
 import bcrypt from 'bcrypt';
@@ -11,10 +11,10 @@ import { generateRandomJTI, hashToken } from "../../../shared/utils/hashToken.js
 
 
 export class AuthService {
-    private refreshTokenRepository: refreshTokenRepository;
+    private refreshTokenRepository: RefreshTokenRepository;
     private userRepository: UserRepository;
 
-    constructor(refreshTokenRepository: refreshTokenRepository, userRepository: UserRepository) {
+    constructor(refreshTokenRepository: RefreshTokenRepository, userRepository: UserRepository) {
         this.refreshTokenRepository = refreshTokenRepository;
         this.userRepository = userRepository;
     }

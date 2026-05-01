@@ -1,8 +1,8 @@
 import {prisma} from '../../../lib/prisma.js'
-import type { refreshTokenData } from '../types/create-refreshToken-data.js';
+import type { RefreshTokenData } from '../types/create-refreshToken-data.js';
 
-export class refreshTokenRepository {
-    public async create(data: refreshTokenData) {
+export class RefreshTokenRepository {
+    public async create(data: RefreshTokenData) {
         return prisma.refreshToken.create({ data });
     }
 
@@ -13,8 +13,11 @@ export class refreshTokenRepository {
     }
     
     public async revokeByTokenHash(tokenHash: string) {
-        return prisma.refreshToken.delete({
-            where: { tokenHash },
-        });
+        return prisma.refreshToken.update({
+            where: {tokenHash},
+            data: {
+                revokedAt: new Date()
+            }
+        })
     }
 }
