@@ -111,6 +111,6 @@ export class AuthService {
 
     await this.refreshTokenRepository.revokeByTokenHash(tokenHash);
 
-    return { success: 'ok' };
+    return { success: true };
   }
 }
