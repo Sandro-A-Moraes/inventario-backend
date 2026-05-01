@@ -67,8 +67,14 @@ export class AuthService {
             expiresAt: new Date(Date.now() + timeToExpire)
         })
 
+        const safeUser: User = {
+            id: existingUser.id,
+            fullName: existingUser.fullName,
+            email: existingUser.email
+        }
+
         return {
-            user: existingUser,
+            user: safeUser,
             accessToken,
             refreshToken
         }
