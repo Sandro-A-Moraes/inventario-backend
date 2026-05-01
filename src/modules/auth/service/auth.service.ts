@@ -114,6 +114,56 @@ export class AuthService {
     return { success: true };
   }
 
+  public async refresh(refreshToken: string): Promise<AuthResponse> {
+    if (!refreshToken) {
+      throw new Error('Refresh token is required');
+    }
+
+    const tokenHash = hashToken(refreshToken);
+    const existingToken =
+      await this.refreshTokenRepository.findByTokenHash(tokenHash);
+
+    if (!existingToken || existingToken.revokedAt || existingToken.expiresAt < new Date()) {
+      throw new Error('Invalid or expired token');
+    }
+
+    const user = await this.userRepository.findById(existingToken.userId);
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const newJTI = generateRandomJTI();
+
+    const newRefreshToken = generateRefreshToken({ sub: user.id, jti: newJTI });
+
+    const newAccessToken = generateAccessToken({
+      sub: user.id,
+      email: user.email,
+    });
+
+    const newTokenHash = hashToken(newRefreshToken);
+
+    await this.refreshTokenRepository.create({
+      userId: user.id,
+      tokenHash: newTokenHash,
+      jti: newJTI,
+      expiresAt: new Date(Date.now() + REFRESH_TOKEN_EXPIRATION_MILLISECONDS),
+    });
+
+    const safeUser: User = {
+      id: user.id,
+      fullName: user.fullName,
+      email: user.email,
+    };
+
+    return {
+      user: safeUser,
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
+    };
+  }
+
   public async me(userId: string): Promise<User> {
     const user = await this.userRepository.findById(userId);
     if (!user) {
