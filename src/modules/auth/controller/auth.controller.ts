@@ -1,3 +1,4 @@
+import type { AuthenticatedRequest } from "../../../shared/types/authenticated-request.js";
 import { AuthService } from "../service/auth.service.js";
 import type { Request, Response } from "express";
 
@@ -29,5 +30,15 @@ export class AuthController {
         const { refreshToken } = req.body;
         const authResponse = await this.authService.refresh(refreshToken);
         res.status(200).json({authResponse});
+    }
+
+    public me = async (req: AuthenticatedRequest, res: Response) => {
+        const userId = req.userId;
+
+        if (!userId) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+        const user = await this.authService.me(userId);
+        res.json({user});
     }
 }
