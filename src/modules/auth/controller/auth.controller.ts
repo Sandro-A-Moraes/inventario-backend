@@ -25,5 +25,9 @@ export class AuthController {
             res.status(204).json({success: true});
     }
 
-    
+    public refresh = async (req: Request, res: Response) => {
+        const { refreshToken } = req.body;
+        const authResponse = await this.authService.refresh(refreshToken);
+        res.status(200).json({authResponse});
+    }
 }
