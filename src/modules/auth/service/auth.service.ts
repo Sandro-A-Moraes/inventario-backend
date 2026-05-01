@@ -113,4 +113,12 @@ export class AuthService {
 
     return { success: true };
   }
+
+  public async me(userId: string): Promise<User> {
+    const user = await this.userRepository.findById(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    return user;
+  }
 }
