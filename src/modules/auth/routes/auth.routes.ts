@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { RefreshTokenRepository } from '../repository/refreshToken.repository.js';
-import { UserRepository } from '../../user/repository/user.repository.js';
-import { AuthController } from '../controller/auth.controller.js';
-import { AuthService } from '../service/auth.service.js';
+import { RefreshTokenRepository } from '../repository/refreshToken.repository';
+import { UserRepository } from '../../user/repository/user.repository';
+import { AuthController } from '../controller/auth.controller';
+import { AuthService } from '../service/auth.service';
 
 const authRoutes = Router();
 const refreshTokenRepository = new RefreshTokenRepository();

@@ -1,7 +1,7 @@
-import { prisma } from '../../../lib/prisma.js';
-import type { createUserData } from '../types/create-user-data.js';
-import type { UserWithPassword } from '../types/user-with-password.js';
-import type { User } from '../types/user.js';
+import { prisma } from '../../../lib/prisma';
+import type { createUserData } from '../types/create-user-data';
+import type { UserWithPassword } from '../types/user-with-password';
+import type { User } from '../types/user';
 
 export class UserRepository {
   public async create(data: createUserData): Promise<User> {

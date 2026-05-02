@@ -1,5 +1,5 @@
-import { prisma } from '../../../lib/prisma.js';
-import type { RefreshTokenData } from '../types/create-refreshToken-data.js';
+import { prisma } from '../../../lib/prisma';
+import type { RefreshTokenData } from '../types/create-refreshToken-data';
 
 export class RefreshTokenRepository {
   public async create(data: RefreshTokenData) {

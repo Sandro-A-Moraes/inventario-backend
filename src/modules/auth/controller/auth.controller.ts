@@ -1,5 +1,5 @@
-import type { AuthenticatedRequest } from "../../../shared/types/authenticated-request.js";
-import { AuthService } from "../service/auth.service.js";
+import type { AuthenticatedRequest } from "../../../shared/types/authenticated-request";
+import { AuthService } from "../service/auth.service";
 import type { Request, Response } from "express";
 
 export class AuthController {

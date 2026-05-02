@@ -1,19 +1,19 @@
-import { UserRepository } from '../../user/repository/user.repository.js';
-import { RefreshTokenRepository } from '../repository/refreshToken.repository.js';
-import type { RegisterData } from '../types/register-data.js';
-import { validateEmail } from '../../../shared/utils/validateEmail.js';
+import { UserRepository } from '../../user/repository/user.repository';
+import { RefreshTokenRepository } from '../repository/refreshToken.repository';
+import type { RegisterData } from '../types/register-data';
+import { validateEmail } from '../../../shared/utils/validateEmail';
 import bcrypt from 'bcrypt';
-import type { LoginData } from '../types/login-data.js';
-import type { User } from '../../user/types/user.js';
-import type { AuthResponse } from '../types/auth-response.js';
+import type { LoginData } from '../types/login-data';
+import type { User } from '../../user/types/user';
+import type { AuthResponse } from '../types/auth-response';
 import {
   generateAccessToken,
   generateRefreshToken,
-} from '../../../shared/utils/generateToken.js';
+} from '../../../shared/utils/generateToken';
 import {
   generateRandomJTI,
   hashToken,
-} from '../../../shared/utils/hashToken.js';
+} from '../../../shared/utils/hashToken';
 
 const REFRESH_TOKEN_EXPIRATION_DAYS = 7;
 const REFRESH_TOKEN_EXPIRATION_MILLISECONDS =
