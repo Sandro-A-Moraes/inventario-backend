@@ -32,7 +32,7 @@ const v1Router = Router();
  *                   example: 3600
  */
 v1Router.get('/health', (_req, res) => {
-  res.json({
+  res.status(200).json({
     status: 'ok',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
