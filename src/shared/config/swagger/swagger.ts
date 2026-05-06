@@ -8,12 +8,17 @@ export const swaggerOptions: Options = {
     info: {
       title: 'Inventário Backend API',
       version: '1.0.0',
-        description: 'API para gerenciamento de inventário, incluindo autenticação e controle de acesso.',
+      description:
+        'API para gerenciamento de inventário, incluindo autenticação e controle de acesso.',
     },
     servers: [
       {
         url: baseUrl,
-        description: 'Servidor de desenvolvimento',
+        description: 'Servidor de produção',
+      },
+      {
+        url: 'http://localhost:3000/api/v1',
+        description: 'Servidor de desenvolvimento local',
       },
     ],
   },

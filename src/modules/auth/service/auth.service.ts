@@ -32,19 +32,21 @@ export class AuthService {
   }
 
   public async register(data: RegisterData): Promise<User> {
-    if (!validateEmail(data.email)) {
+    const {password, ...userData} = data;
+
+    if (!validateEmail(userData.email)) {
       throw new Error('Invalid email format');
     }
 
-    const existingUser = await this.userRepository.findByEmail(data.email);
+    const existingUser = await this.userRepository.findByEmail(userData.email);
     if (existingUser) {
       throw new Error('Email already in use');
     }
 
-    const hashedPassword = await bcrypt.hash(data.password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     return this.userRepository.create({
-      ...data,
+      ...userData,
       hashedPassword,
     });
   }
