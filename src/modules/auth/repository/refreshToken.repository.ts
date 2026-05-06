@@ -7,10 +7,12 @@ export class RefreshTokenRepository {
   }
 
   public async findByTokenHash(tokenHash: string) {
+    console.log('Finding refresh token with hash:', tokenHash);
     return prisma.refreshToken.findUnique({
       where: { tokenHash },
     });
   }
+
 
   public async revokeByTokenHash(tokenHash: string) {
     return prisma.refreshToken.update({
@@ -20,5 +22,7 @@ export class RefreshTokenRepository {
       },
     });
   }
+
+
 
 }

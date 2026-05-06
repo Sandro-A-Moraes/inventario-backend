@@ -3,4 +3,5 @@ export type UserWithPassword = {
   fullName: string;
   email: string;
   hashedPassword: string;
+  tokenVersion: number;
 };

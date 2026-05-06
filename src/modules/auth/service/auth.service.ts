@@ -10,10 +10,7 @@ import {
   generateAccessToken,
   generateRefreshToken,
 } from '../../../shared/utils/generateToken';
-import {
-  generateRandomJTI,
-  hashToken,
-} from '../../../shared/utils/hashToken';
+import { generateRandomJTI, hashToken } from '../../../shared/utils/hashToken';
 
 const REFRESH_TOKEN_EXPIRATION_DAYS = 7;
 const REFRESH_TOKEN_EXPIRATION_MILLISECONDS =
@@ -32,7 +29,7 @@ export class AuthService {
   }
 
   public async register(data: RegisterData): Promise<User> {
-    const {password, ...userData} = data;
+    const { password, ...userData } = data;
 
     if (!validateEmail(userData.email)) {
       throw new Error('Invalid email format');
@@ -76,6 +73,7 @@ export class AuthService {
     const accessToken = generateAccessToken({
       sub: existingUser.id,
       email: existingUser.email,
+      tokenVersion: existingUser.tokenVersion,
     });
 
     await this.refreshTokenRepository.create({
@@ -89,6 +87,7 @@ export class AuthService {
       id: existingUser.id,
       fullName: existingUser.fullName,
       email: existingUser.email,
+      tokenVersion: existingUser.tokenVersion,
     };
 
     return {
@@ -113,6 +112,8 @@ export class AuthService {
 
     await this.refreshTokenRepository.revokeByTokenHash(tokenHash);
 
+    await this.userRepository.incrementTokenVersion(existingToken.userId);
+
     return { success: true };
   }
 
@@ -125,7 +126,11 @@ export class AuthService {
     const existingToken =
       await this.refreshTokenRepository.findByTokenHash(tokenHash);
 
-    if (!existingToken || existingToken.revokedAt || existingToken.expiresAt < new Date()) {
+    if (
+      !existingToken ||
+      existingToken.revokedAt ||
+      existingToken.expiresAt < new Date()
+    ) {
       throw new Error('Invalid or expired token');
     }
 
@@ -142,6 +147,7 @@ export class AuthService {
     const newAccessToken = generateAccessToken({
       sub: user.id,
       email: user.email,
+      tokenVersion: user.tokenVersion,
     });
 
     const newTokenHash = hashToken(newRefreshToken);
@@ -157,6 +163,7 @@ export class AuthService {
       id: user.id,
       fullName: user.fullName,
       email: user.email,
+      tokenVersion: user.tokenVersion,
     };
 
     return {
