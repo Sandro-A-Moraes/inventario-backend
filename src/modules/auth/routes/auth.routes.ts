@@ -3,12 +3,14 @@ import { RefreshTokenRepository } from '../repository/refreshToken.repository';
 import { UserRepository } from '../../user/repository/user.repository';
 import { AuthController } from '../controller/auth.controller';
 import { AuthService } from '../service/auth.service';
+import { AuthMiddleware } from '../../middleware/auth.middleware';
 
 const authRoutes = Router();
 const refreshTokenRepository = new RefreshTokenRepository();
 const userRepository = new UserRepository();
 const authService = new AuthService(refreshTokenRepository, userRepository);
 const authController = new AuthController(authService);
+const authMiddleware = new AuthMiddleware();
 
 /**
  * @swagger
@@ -315,6 +317,6 @@ authRoutes.post('/refresh', authController.refresh);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-authRoutes.get('/me', authController.me);
+authRoutes.get('/me', authMiddleware.authenticate, authController.me);
 
 export default authRoutes;
