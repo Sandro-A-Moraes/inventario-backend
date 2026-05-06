@@ -30,14 +30,20 @@ const authMiddleware = new AuthMiddleware();
  *           type: string
  *           format: email
  *           description: Unique user email
+ *         tokenVersion:
+ *           type: integer
+ *           format: int32
+ *           description: User token version used to invalidate active tokens
  *       required:
  *         - id
  *         - fullName
  *         - email
+ *         - tokenVersion
  *       example:
  *         id: "550e8400-e29b-41d4-a716-446655440000"
  *         fullName: "John Doe"
  *         email: "john@example.com"
+ *         tokenVersion: 0
  *
  *     AuthResponse:
  *       type: object
@@ -196,7 +202,7 @@ authRoutes.post('/login', authController.login);
  * /auth/logout:
  *   post:
  *     summary: User logout
- *     description: Revokes the provided refreshToken, ending the session
+ *     description: Revokes the provided refresh token and increments the user's token version to invalidate active access tokens
  *     tags:
  *       - Auth
  *     requestBody:
@@ -218,6 +224,12 @@ authRoutes.post('/login', authController.login);
  *         description: Logout successful (no content)
  *       400:
  *         description: Invalid or missing refresh token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       409:
+ *         description: Refresh token already revoked
  *         content:
  *           application/json:
  *             schema:
@@ -283,7 +295,7 @@ authRoutes.post('/refresh', authController.refresh);
  * /auth/me:
  *   get:
  *     summary: Get authenticated user data
- *     description: Returns the data of the currently authenticated user
+ *     description: Returns the data of the currently authenticated user. Requires a valid Bearer access token.
  *     tags:
  *       - Auth
  *     security:
@@ -299,7 +311,7 @@ authRoutes.post('/refresh', authController.refresh);
  *                 user:
  *                   $ref: '#/components/schemas/User'
  *       401:
- *         description: Token not provided or invalid
+ *         description: Authorization header missing, invalid authorization format, invalid token, or user not found
  *         content:
  *           application/json:
  *             schema:
