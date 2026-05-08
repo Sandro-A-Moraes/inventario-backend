@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { Prisma } from '../../../generated/prisma/client';
+import { AppError } from '../../../shared/errors/AppError';
 
 export function errorHandler(
   err: Error,
@@ -9,26 +10,8 @@ export function errorHandler(
 ) {
   console.error('[ERROR]', err.message);
 
-  if (err instanceof Error) {
-    if (
-      err.message.includes('not registered') ||
-      err.message.includes('Invalid email or password') ||
-      err.message.includes('Invalid or expired token') ||
-      err.message.includes('Token already revoked') ||
-      err.message.includes('Refresh token is required') ||
-      err.message.includes('Incorrect')
-    ) {
-      return res.status(401).json({ error: err.message });
-    }
-
-    if (err.message.includes('Invalid')) {
-      return res.status(400).json({ error: err.message });
-    }
-
-
-    if (err.message.includes('already')) {
-      return res.status(409).json({ error: err.message });
-    }
+  if (err instanceof AppError) {
+    return res.status(err.statusCode).json({ error: err.message });
   }
 
   if (err instanceof Prisma.PrismaClientKnownRequestError) {

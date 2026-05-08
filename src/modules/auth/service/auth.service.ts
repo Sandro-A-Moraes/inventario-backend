@@ -11,6 +11,7 @@ import {
   generateRefreshToken,
 } from '../../../shared/utils/generateToken';
 import { generateRandomJTI, hashToken } from '../../../shared/utils/hashToken';
+import { AppError } from '../../../shared/errors/AppError';
 
 const REFRESH_TOKEN_EXPIRATION_DAYS = 7;
 const REFRESH_TOKEN_EXPIRATION_MILLISECONDS =
@@ -32,12 +33,12 @@ export class AuthService {
     const { password, ...userData } = data;
 
     if (!validateEmail(userData.email)) {
-      throw new Error('Invalid email format');
+      throw new AppError('Invalid email format', 400);
     }
 
     const existingUser = await this.userRepository.findByEmail(userData.email);
     if (existingUser) {
-      throw new Error('Email already in use');
+      throw new AppError('Email already in use', 409);
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -52,7 +53,7 @@ export class AuthService {
     const existingUser = await this.userRepository.findByEmail(data.email);
 
     if (!existingUser) {
-      throw new Error('Invalid email or password');
+      throw new AppError('Invalid email or password', 401);
     }
 
     const isPasswordValid = await bcrypt.compare(
@@ -61,7 +62,7 @@ export class AuthService {
     );
 
     if (!isPasswordValid) {
-      throw new Error('Invalid email or password');
+      throw new AppError('Invalid email or password', 401);
     }
 
     const jti = generateRandomJTI();
@@ -103,11 +104,11 @@ export class AuthService {
       await this.refreshTokenRepository.findByTokenHash(tokenHash);
 
     if (!existingToken) {
-      throw new Error('Invalid or expired token');
+      throw new AppError('Invalid or expired token', 401);
     }
 
     if (existingToken.revokedAt) {
-      throw new Error('Token already revoked');
+      throw new AppError('Token already revoked', 401);
     }
 
     await this.refreshTokenRepository.revokeByTokenHash(tokenHash);
@@ -119,7 +120,7 @@ export class AuthService {
 
   public async refresh(refreshToken: string): Promise<AuthResponse> {
     if (!refreshToken) {
-      throw new Error('Refresh token is required');
+      throw new AppError('Refresh token is required', 400);
     }
 
     const tokenHash = hashToken(refreshToken);
@@ -131,13 +132,13 @@ export class AuthService {
       existingToken.revokedAt ||
       existingToken.expiresAt < new Date()
     ) {
-      throw new Error('Invalid or expired token');
+      throw new AppError('Invalid or expired token', 401);
     }
 
     const user = await this.userRepository.findById(existingToken.userId);
 
     if (!user) {
-      throw new Error('User not found');
+      throw new AppError('User not found', 404);
     }
 
     const newJTI = generateRandomJTI();
@@ -176,7 +177,7 @@ export class AuthService {
   public async me(userId: string): Promise<User> {
     const user = await this.userRepository.findById(userId);
     if (!user) {
-      throw new Error('User not found');
+      throw new AppError('User not found', 404);
     }
     return user;
   }
