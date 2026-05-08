@@ -13,6 +13,7 @@
     "dev": "tsx watch src/infra/http/server.ts",
     "ai:review": "tsx src/ai/run-agent.ts",
     "start": "tsx src/infra/http/server.ts",
+    "build": "tsc --noEmit",
     "postinstall": "prisma generate",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
