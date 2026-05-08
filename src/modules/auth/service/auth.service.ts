@@ -1,5 +1,5 @@
-import { UserRepository } from '../../user/repository/user.repository';
-import { RefreshTokenRepository } from '../repository/refreshToken.repository';
+import type { IUserRepository } from '../../user/repository/IUserRepository';
+import type { IRefreshTokenRepository } from '../repository/IRefreshTokenRepository';
 import type { RegisterData } from '../types/register-data';
 import { validateEmail } from '../../../shared/utils/validateEmail';
 import bcrypt from 'bcrypt';
@@ -18,12 +18,12 @@ const REFRESH_TOKEN_EXPIRATION_MILLISECONDS =
   REFRESH_TOKEN_EXPIRATION_DAYS * 24 * 60 * 60 * 1000;
 
 export class AuthService {
-  private refreshTokenRepository: RefreshTokenRepository;
-  private userRepository: UserRepository;
+  private refreshTokenRepository: IRefreshTokenRepository;
+  private userRepository: IUserRepository;
 
   constructor(
-    refreshTokenRepository: RefreshTokenRepository,
-    userRepository: UserRepository,
+    refreshTokenRepository: IRefreshTokenRepository,
+    userRepository: IUserRepository,
   ) {
     this.refreshTokenRepository = refreshTokenRepository;
     this.userRepository = userRepository;
