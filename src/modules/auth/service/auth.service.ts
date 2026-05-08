@@ -52,7 +52,7 @@ export class AuthService {
     const existingUser = await this.userRepository.findByEmail(data.email);
 
     if (!existingUser) {
-      throw new Error('Email not registered');
+      throw new Error('Invalid email or password');
     }
 
     const isPasswordValid = await bcrypt.compare(
@@ -61,7 +61,7 @@ export class AuthService {
     );
 
     if (!isPasswordValid) {
-      throw new Error('Incorrect Password');
+      throw new Error('Invalid email or password');
     }
 
     const jti = generateRandomJTI();
