@@ -129,7 +129,13 @@ const authMiddleware = new AuthMiddleware();
  *                 user:
  *                   $ref: '#/components/schemas/User'
  *       400:
- *         description: Invalid data or email already registered
+ *         description: Invalid email format
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       409:
+ *         description: Email already in use
  *         content:
  *           application/json:
  *             schema:
@@ -182,7 +188,7 @@ authRoutes.post('/register', authController.register);
  *               properties:
  *                 authResponse:
  *                   $ref: '#/components/schemas/AuthResponse'
- *       400:
+ *       401:
  *         description: Invalid email or password
  *         content:
  *           application/json:
@@ -222,14 +228,8 @@ authRoutes.post('/login', authController.login);
  *     responses:
  *       204:
  *         description: Logout successful (no content)
- *       400:
- *         description: Invalid or missing refresh token
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
- *       409:
- *         description: Refresh token already revoked
+ *       401:
+ *         description: Invalid or expired refresh token, or refresh token already revoked
  *         content:
  *           application/json:
  *             schema:
@@ -276,6 +276,12 @@ authRoutes.post('/logout', authController.logout);
  *                 authResponse:
  *                   $ref: '#/components/schemas/AuthResponse'
  *       400:
+ *         description: Refresh token is required
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       401:
  *         description: Invalid or expired refresh token
  *         content:
  *           application/json:
