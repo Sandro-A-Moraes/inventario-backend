@@ -10,8 +10,22 @@ import {
 } from '../../shared/config/swagger/swaggerSetup';
 
 const app = express();
-app.use(cors());
+
+app.use(
+  cors({
+    origin: 'http://localhost:5173',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  }),
+);
+
+
+app.use((req, _res, next)=>{
+  console.log(`${req.method} ${req.url}`);
+  next();
+});
 app.use(express.json());
+
 
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
