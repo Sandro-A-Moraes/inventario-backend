@@ -8,6 +8,7 @@ import {
   swaggerSpec,
   swaggerUi,
 } from '../../shared/config/swagger/swaggerSetup';
+import cookieParser from 'cookie-parser';
 
 const app = express();
 
@@ -18,8 +19,11 @@ app.use(
     origin: allowedOrigins,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
   }),
 );
+
+app.use(cookieParser());
 
 
 app.use((req, _res, next)=>{
