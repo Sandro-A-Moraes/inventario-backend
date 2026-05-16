@@ -33,9 +33,6 @@ export class AuthController {
                 maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
             });
 
-            console.log('Access Token:', authResponse.accessToken);
-            console.log('Refresh Token:', authResponse.refreshToken);
-
             res.status(200).json({authResponse});
         } catch (error: unknown) {
             if (error instanceof Error) {
