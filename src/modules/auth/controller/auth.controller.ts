@@ -16,8 +16,30 @@ export class AuthController {
     }
 
     public login = async (req: Request, res: Response) => {
+        try {
             const authResponse = await this.authService.login(req.body);
-            res.json({authResponse});
+
+            res.cookie('accessToken', authResponse.accessToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                maxAge: 15 * 60 * 1000, // 15 minutes
+            });
+
+            res.cookie('refreshToken', authResponse.refreshToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+            });
+            res.status(200).json({authResponse});
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+              res.status(401).json({ message: error.message });
+            } else {
+              res.status(400).json({ message: 'Unknown error' });
+            }
+        }
     }
 
     public logout = async (req: Request, res: Response) => {
