@@ -180,7 +180,7 @@ authRoutes.post('/register', authController.register);
  *             password: "securePassword123!"
  *     responses:
  *       200:
- *         description: Login successful
+ *         description: Login successful. Response body contains `authResponse`; additionally `accessToken` and `refreshToken` are set as HttpOnly cookies named `accessToken` and `refreshToken`.
  *         content:
  *           application/json:
  *             schema:
@@ -211,20 +211,7 @@ authRoutes.post('/login', authController.login);
  *     description: Revokes the provided refresh token and increments the user's token version to invalidate active access tokens
  *     tags:
  *       - Auth
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               refreshToken:
- *                 type: string
- *                 description: Refresh token to be revoked
- *             required:
- *               - refreshToken
- *           example:
- *             refreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *     description: Revokes the refresh token provided as an HttpOnly cookie named `refreshToken`. No request body is required; the client must send the cookie.
  *     responses:
  *       204:
  *         description: Logout successful (no content)
@@ -251,32 +238,20 @@ authRoutes.post('/logout', authController.logout);
  *     description: Generates a new access token using a valid refresh token
  *     tags:
  *       - Auth
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               refreshToken:
- *                 type: string
- *                 description: Valid refresh token
- *             required:
- *               - refreshToken
- *           example:
- *             refreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *     description: Generates a new access token using a valid refresh token stored in an HttpOnly cookie named `refreshToken`. No request body is required; the client must send the cookie.
  *     responses:
  *       200:
- *         description: Access token successfully refreshed
+ *         description: Access token successfully refreshed. The new `accessToken` is set as an HttpOnly cookie named `accessToken` and the response body will be `{ "success": true }`.
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 authResponse:
- *                   $ref: '#/components/schemas/AuthResponse'
+ *                 success:
+ *                   type: boolean
+ *                   example: true
  *       400:
- *         description: Refresh token is required
+ *         description: Refresh token is required (cookie missing)
  *         content:
  *           application/json:
  *             schema:

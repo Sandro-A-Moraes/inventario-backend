@@ -11,6 +11,8 @@ Funcionalidades implementadas até o momento:
 
 - Cadastro de usuário
 - Login com geração de access token e refresh token
+- Login com geração de access token e refresh token (entregues como HttpOnly
+  cookies)
 - Logout com revogação de refresh token
 - Renovação de sessão por refresh token
 - Endpoint de perfil autenticado (`/me`)
@@ -132,21 +134,24 @@ Observações importantes:
 3. Gera `jti` aleatório.
 4. Gera refresh token (JWT) e salva hash do token no banco.
 5. Gera access token com `sub`, `email` e `tokenVersion`.
+6. Os tokens são definidos como cookies HttpOnly: `accessToken` (15m) e
+   `refreshToken` (7d).
 
 ### Logout
 
-1. Recebe refresh token.
+1. Lê o refresh token do cookie HttpOnly `refreshToken`.
 2. Busca hash no banco.
 3. Revoga token (`revokedAt`).
 4. Incrementa `tokenVersion` do usuário para invalidar access tokens ativos.
 
 ### Refresh
 
-1. Valida presença do refresh token.
+1. Valida presença do refresh token no cookie HttpOnly `refreshToken`.
 2. Busca token por hash.
 3. Verifica se existe, não está revogado e não expirou.
 4. Busca usuário.
-5. Gera novo par de tokens e salva novo refresh token no banco.
+5. Gera novo par de tokens e salva novo refresh token no banco. O novo
+   `accessToken` é entregue como cookie HttpOnly.
 
 ### Endpoint protegido (`/me`)
 
@@ -183,6 +188,11 @@ Resposta:
 - `POST /auth/logout`
 - `POST /auth/refresh`
 - `GET /auth/me` (protegida por Bearer token)
+
+Observação: o endpoint `POST /auth/login` define os cookies HttpOnly
+`accessToken` e `refreshToken`. Os endpoints `POST /auth/refresh` e
+`POST /auth/logout` leem o refresh token a partir do cookie HttpOnly
+`refreshToken` (não é necessário enviar o token no corpo da requisição).
 
 ## Tratamento de erros
 
@@ -305,11 +315,33 @@ npm run test:coverage
 ## Swagger
 
 A documentação OpenAPI é gerada a partir de anotações nas rotas
-(`src/modules/**/routes/*.ts`).
+(`src/modules/**/routes/*.ts`). As rotas de autenticação foram atualizadas para
+documentar que os tokens podem ser entregues/leídos via cookies HttpOnly
+(`accessToken` e `refreshToken`).
 
 URL local:
 
 - `http://localhost:3000/docs`
+
+Exemplos rápidos com `curl` (salvando/reenviando cookies):
+
+1. Login (salva cookies em `cookies.txt`):
+
+```bash
+curl -c cookies.txt -H "Content-Type: application/json" -X POST http://localhost:3000/api/v1/auth/login -d '{"email":"john@example.com","password":"securePassword123!"}'
+```
+
+2. Refresh (envia cookie salvo):
+
+```bash
+curl -b cookies.txt -X POST http://localhost:3000/api/v1/auth/refresh
+```
+
+3. Logout (envia cookie salvo):
+
+```bash
+curl -b cookies.txt -X POST http://localhost:3000/api/v1/auth/logout
+```
 
 ## Utilitário de revisão por IA
 
