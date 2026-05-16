@@ -180,7 +180,7 @@ authRoutes.post('/register', authController.register);
  *             password: "securePassword123!"
  *     responses:
  *       200:
- *         description: Login successful. Response body contains `authResponse`; additionally `accessToken` and `refreshToken` are set as HttpOnly cookies named `accessToken` and `refreshToken`.
+ *         description: Login successful. Response body contains authResponse; additionally accessToken and refreshToken are set as HttpOnly cookies.
  *         content:
  *           application/json:
  *             schema:
@@ -208,10 +208,9 @@ authRoutes.post('/login', authController.login);
  * /auth/logout:
  *   post:
  *     summary: User logout
- *     description: Revokes the provided refresh token and increments the user's token version to invalidate active access tokens
+ *     description: Revokes the refresh token provided as an HttpOnly cookie named refreshToken and increments the user's token version to invalidate active access tokens. No request body is required.
  *     tags:
  *       - Auth
- *     description: Revokes the refresh token provided as an HttpOnly cookie named `refreshToken`. No request body is required; the client must send the cookie.
  *     responses:
  *       204:
  *         description: Logout successful (no content)
@@ -235,13 +234,12 @@ authRoutes.post('/logout', authController.logout);
  * /auth/refresh:
  *   post:
  *     summary: Refresh access token
- *     description: Generates a new access token using a valid refresh token
+ *     description: Generates a new access token using a valid refresh token stored in an HttpOnly cookie named refreshToken. No request body is required.
  *     tags:
  *       - Auth
- *     description: Generates a new access token using a valid refresh token stored in an HttpOnly cookie named `refreshToken`. No request body is required; the client must send the cookie.
  *     responses:
  *       200:
- *         description: Access token successfully refreshed. The new `accessToken` is set as an HttpOnly cookie named `accessToken` and the response body will be `{ "success": true }`.
+ *         description: "Access token successfully refreshed. The new accessToken is set as an HttpOnly cookie; the response body returns a JSON object with success: true."
  *         content:
  *           application/json:
  *             schema:
