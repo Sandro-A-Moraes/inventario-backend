@@ -32,6 +32,10 @@ export class AuthController {
                 sameSite: 'strict',
                 maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
             });
+
+            console.log('Access Token:', authResponse.accessToken);
+            console.log('Refresh Token:', authResponse.refreshToken);
+
             res.status(200).json({authResponse});
         } catch (error: unknown) {
             if (error instanceof Error) {
@@ -49,9 +53,26 @@ export class AuthController {
     }
 
     public refresh = async (req: Request, res: Response) => {
-        const { refreshToken } = req.body;
-        const authResponse = await this.authService.refresh(refreshToken);
-        res.status(200).json({authResponse});
+        const { refreshToken } = req.cookies.refreshToken;
+
+        try {
+          const result = await this.authService.refresh(refreshToken);
+
+          res.cookie('accessToken', result.accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 15 * 60 * 1000, // 15 minutes
+          });
+
+          res.status(200).json({ success: true });
+        } catch (error: unknown) {
+          if (error instanceof Error) {
+            res.status(401).json({ message: error.message });
+          } else {
+            res.status(400).json({ message: 'Unknown error' });
+          }
+        }
     }
 
     public me = async (req: AuthenticatedRequest, res: Response) => {
