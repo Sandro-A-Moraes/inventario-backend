@@ -47,9 +47,14 @@ export class AuthController {
     }
 
     public logout = async (req: Request, res: Response) => {
-            const { refreshToken } = req.body;
+            const refreshToken = req.cookies.refreshToken;
+
             await this.authService.logout(refreshToken);
-            res.status(204).json({success: true});
+
+            res.clearCookie('accessToken');
+            res.clearCookie('refreshToken');
+
+            return res.status(204).send();
     }
 
     public refresh = async (req: Request, res: Response) => {
