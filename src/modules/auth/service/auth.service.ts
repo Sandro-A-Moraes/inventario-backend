@@ -98,6 +98,20 @@ export class AuthService {
     };
   }
 
+  public async forgotPassword(email: string): Promise<void | { message: string }> {
+    const user = await this.userRepository.findByEmail(email);
+
+    if (!user) {
+      return {
+        message: 'If an account with that email exists, a password reset link has been sent.',
+      }
+    }
+
+    
+
+  }
+
+
   public async logout(refreshToken: string) {
     const tokenHash = hashToken(refreshToken);
     const existingToken =
