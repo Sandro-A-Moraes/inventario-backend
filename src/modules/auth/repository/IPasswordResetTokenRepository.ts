@@ -12,4 +12,6 @@ export interface IPasswordResetTokenRepository {
   markAsUsed(tokenHash: string): Promise<void>;
 
   deleteByUserId(userId: string): Promise<void>;
+
+  revokeActiveTokensByUserId(userId: string): Promise<void>;
 }

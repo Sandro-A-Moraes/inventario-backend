@@ -701,6 +701,7 @@ export const PasswordResetTokenScalarFieldEnum = {
   userId: 'userId',
   createdAt: 'createdAt',
   expiresAt: 'expiresAt',
+  revokedAt: 'revokedAt',
   usedAt: 'usedAt'
 } as const
 

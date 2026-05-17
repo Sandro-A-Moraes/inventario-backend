@@ -119,7 +119,7 @@ export class AuthService {
       return { message };
     }
 
-    await this.passwordResetTokenRepository.deleteByUserId(user.id);
+    await this.passwordResetTokenRepository.revokeActiveTokensByUserId(user.id);
 
     const token = generateSecureToken();
     const tokenHash = hashToken(token);

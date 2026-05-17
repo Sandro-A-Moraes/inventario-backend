@@ -33,4 +33,18 @@ export class PasswordResetTokenRepository implements IPasswordResetTokenReposito
       where: { userId, usedAt: null },
     });
   }
+
+  public async revokeActiveTokensByUserId(userId: string): Promise<void> {
+    await prisma.passwordResetToken.updateMany({
+      where: {
+        userId,
+        usedAt: null,
+        revokedAt: null,
+        expiresAt: { gt: new Date() },
+      },
+      data: {
+        revokedAt: new Date(),
+      },
+    });
+  }
 }

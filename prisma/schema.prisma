@@ -29,7 +29,7 @@ model RefreshToken {
   jti       String @unique
   tokenHash String @unique
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userAgent String?
   ipAddress String?
   createdAt DateTime @default(now())
@@ -37,16 +37,19 @@ model RefreshToken {
   revokedAt DateTime?
 
   @@index([userId])
+  @@index([tokenHash])
 }
 
 model PasswordResetToken {
   id        String   @id @default(uuid())
   tokenHash String @unique
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   expiresAt DateTime
+  revokedAt DateTime?
   usedAt    DateTime?
 
   @@index([userId])
+  @@index([tokenHash])
 }
