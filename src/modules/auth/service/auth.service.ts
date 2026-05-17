@@ -1,5 +1,6 @@
 import type { IUserRepository } from '../../user/repository/IUserRepository';
 import type { IRefreshTokenRepository } from '../repository/IRefreshTokenRepository';
+import type { IPasswordResetTokenRepository } from '../repository/IPasswordResetTokenRepository';
 import type { RegisterData } from '../types/register-data';
 import { validateEmail } from '../../../shared/utils/validateEmail';
 import bcrypt from 'bcrypt';
@@ -9,6 +10,7 @@ import type { AuthResponse } from '../types/auth-response';
 import {
   generateAccessToken,
   generateRefreshToken,
+  generateSecureToken,
 } from '../../../shared/utils/generateToken';
 import { generateRandomJTI, hashToken } from '../../../shared/utils/hashToken';
 import { AppError } from '../../../shared/errors/AppError';
@@ -16,17 +18,26 @@ import { AppError } from '../../../shared/errors/AppError';
 const REFRESH_TOKEN_EXPIRATION_DAYS = 7;
 const REFRESH_TOKEN_EXPIRATION_MILLISECONDS =
   REFRESH_TOKEN_EXPIRATION_DAYS * 24 * 60 * 60 * 1000;
+const PASSWORD_RESET_EXPIRATION_MINUTES = 60;
+const message =
+  'If an account with that email exists, a password reset link has been sent.';
+
+const PASSWORD_RESET_EXPIRATION_MS =
+  PASSWORD_RESET_EXPIRATION_MINUTES * 60 * 1000;
 
 export class AuthService {
   private refreshTokenRepository: IRefreshTokenRepository;
   private userRepository: IUserRepository;
+  private passwordResetTokenRepository: IPasswordResetTokenRepository;
 
   constructor(
     refreshTokenRepository: IRefreshTokenRepository,
     userRepository: IUserRepository,
+    passwordResetTokenRepository: IPasswordResetTokenRepository,
   ) {
     this.refreshTokenRepository = refreshTokenRepository;
     this.userRepository = userRepository;
+    this.passwordResetTokenRepository = passwordResetTokenRepository;
   }
 
   public async register(data: RegisterData): Promise<User> {
@@ -98,19 +109,30 @@ export class AuthService {
     };
   }
 
-  public async forgotPassword(email: string): Promise<void | { message: string }> {
+  public async forgotPassword(
+    email: string,
+  ): Promise<{ message: string; resetToken?: string }> {
     const user = await this.userRepository.findByEmail(email);
-
-    if (!user) {
-      return {
-        message: 'If an account with that email exists, a password reset link has been sent.',
-      }
-    }
-
     
 
-  }
+    if (!user) {
+      return { message };
+    }
 
+    await this.passwordResetTokenRepository.deleteByUserId(user.id);
+
+    const token = generateSecureToken();
+    const tokenHash = hashToken(token);
+    const expiresAt = new Date(Date.now() + PASSWORD_RESET_EXPIRATION_MS);
+
+    await this.passwordResetTokenRepository.create({
+      userId: user.id,
+      tokenHash,
+      expiresAt,
+    });
+
+    return { message, resetToken: token };
+  }
 
   public async logout(refreshToken: string) {
     const tokenHash = hashToken(refreshToken);

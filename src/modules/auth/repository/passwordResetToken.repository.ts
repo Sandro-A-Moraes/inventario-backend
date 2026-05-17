@@ -1,5 +1,5 @@
 import { prisma } from '../../../lib/prisma';
-import type { IPasswordResetTokenRepository } from './IPasswordResetToken';
+import type { IPasswordResetTokenRepository } from './IPasswordResetTokenRepository';
 import type { PasswordResetToken } from '../types/password-reset-token';
 
 
@@ -20,6 +20,12 @@ export class PasswordResetTokenRepository implements IPasswordResetTokenReposito
             data: {
                 usedAt: new Date(),
             },
+        });
+    }
+
+    public async deleteByUserId(userId: string): Promise<void> {
+        await prisma.passwordResetToken.deleteMany({
+            where: { userId },
         });
     }
 }
