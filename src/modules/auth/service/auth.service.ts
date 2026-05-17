@@ -171,6 +171,8 @@ export class AuthService {
       throw new AppError('Invalid or expired token', 401);
     }
 
+    await this.refreshTokenRepository.revokeByTokenHash(tokenHash);
+
     const user = await this.userRepository.findById(existingToken.userId);
 
     if (!user) {
