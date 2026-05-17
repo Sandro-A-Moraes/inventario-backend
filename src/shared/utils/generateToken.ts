@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import type { AccessTokenPayload } from '../../modules/auth/types/access-token-payload';
 import type { RefreshTokenPayload } from '../../modules/auth/types/refresh-token-payload';
 import { env } from '../config/env';
+import crypto from 'crypto';
 
 export function generateAccessToken(payload: AccessTokenPayload): string {
   return jwt.sign(payload, env.JWT_SECRET_KEY, {
@@ -13,4 +14,8 @@ export function generateRefreshToken(payload: RefreshTokenPayload): string {
   return jwt.sign(payload, env.JWT_REFRESH_SECRET_KEY, {
     expiresIn: '7d',
   });
+}
+
+export function generateSecureToken() {
+  return crypto.randomBytes(32).toString('hex');
 }
